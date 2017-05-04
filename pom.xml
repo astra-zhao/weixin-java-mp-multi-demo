@@ -11,8 +11,8 @@
 	<description>weixin mp multi demo with spring MVC</description>
 	<url>https://github.com/wechat-group/weixin-java-mp-multi-demo</url>
 	<properties>
-	    <maven.compiler.source>1.7</maven.compiler.source>
-	    <maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 
 		<weixin-java-mp.version>2.6.0</weixin-java-mp.version>
 		<spring.version>4.3.2.RELEASE</spring.version>
@@ -84,6 +84,11 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
+		<dependency>
+        	<groupId>org.testng</groupId>
+        	<artifactId>testng</artifactId>
+        	<version>6.8.7</version>
+      </dependency>
 	</dependencies>
 
 	<build>

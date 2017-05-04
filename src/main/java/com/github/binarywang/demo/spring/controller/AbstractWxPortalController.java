@@ -18,6 +18,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
  */
 public abstract class AbstractWxPortalController {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  public static volatile String openId=null;
 
   @ResponseBody
   @GetMapping(produces = "text/plain;charset=utf-8")
@@ -53,6 +54,8 @@ public abstract class AbstractWxPortalController {
     if (encType == null) {
       // 明文传输的消息
       WxMpXmlMessage inMessage = WxMpXmlMessage.fromXml(requestBody);
+      openId = inMessage.getFromUser();
+      this.logger.info("当前用户的OpenID:"+openId);
       WxMpXmlOutMessage outMessage = this.getWxService().route(inMessage);
       if (outMessage == null) {
         return "";
@@ -62,12 +65,13 @@ public abstract class AbstractWxPortalController {
       // aes加密的消息
       WxMpXmlMessage inMessage = WxMpXmlMessage.fromEncryptedXml(requestBody,
           this.getWxService().getWxMpConfigStorage(), timestamp, nonce, msgSignature);
+      openId = inMessage.getFromUser();
+      this.logger.info("当前用户的OpenID:"+openId);
       this.logger.debug("\n消息解密后内容为：\n{} ", inMessage.toString());
       WxMpXmlOutMessage outMessage = this.getWxService().route(inMessage);
       if (outMessage == null) {
         return "";
       }
-
       out = outMessage.toEncryptedXml(this.getWxService().getWxMpConfigStorage());
     }
 
