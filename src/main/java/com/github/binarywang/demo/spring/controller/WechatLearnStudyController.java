@@ -3,11 +3,15 @@ package com.github.binarywang.demo.spring.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -15,8 +19,11 @@ import com.github.binarywang.demo.spring.modal.Classes;
 import com.github.binarywang.demo.spring.service.BaseWxService;
 import com.github.binarywang.demo.spring.service.Gzh1WxService;
 
+import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
 @RestController
 @RequestMapping("/learn")
@@ -33,8 +40,18 @@ public class WechatLearnStudyController extends AbstractWxPortalController{
 		return null;
 	}
 	
-	@RequestMapping(value ="",method=RequestMethod.GET)
-	public ModelAndView  index(String pagenum,Classes classes)throws WxErrorException{
+	@RequestMapping(value="")
+	public ModelAndView Oauth(){
+		ModelAndView mv=new ModelAndView();
+		String url=wxService.oauth2buildAuthorizationUrl("http://astra.ngrok.cc/learn/list", WxConsts.OAUTH2_SCOPE_USER_INFO, null);
+		mv.setViewName("redirect:"+url);
+		logger.info(url);
+		return mv;
+	}
+	
+	
+	@RequestMapping(value ="/list",method=RequestMethod.GET)
+	public ModelAndView  index(String pagenum,Classes classes,HttpServletRequest request, HttpServletResponse response,@RequestParam String code)throws WxErrorException{
 		ModelAndView mv=new ModelAndView();
 		mv.setViewName("classes");
 		mv.addObject("sidebar","classes");
@@ -47,15 +64,20 @@ public class WechatLearnStudyController extends AbstractWxPortalController{
 		mv.addObject("length", list.size());
 		mv.addObject("pagenum", num);
 		mv.addObject("classes", classes);
-		logger.info("当前得到的OpenID="+openId);
+		WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxService.oauth2getAccessToken(code);
+		WxMpUser wxMpUser = wxService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
+		logger.info("当前得到的微信Code="+wxMpUser.getOpenId());
+		
+//		logger.info("当前得到的OpenID="+wxMpUser.getOpenId());
 		return mv;		
 	}
 	
 	@RequestMapping(value="/addclassespage",method=RequestMethod.GET)
-	public ModelAndView addClassesPage(){
+	public ModelAndView addClassesPage(HttpServletRequest request, HttpServletResponse response){
 		ModelAndView mv=new ModelAndView();
 		mv.setViewName("addclasses");
 		mv.addObject("sidebar","classes");
+		logger.info("当前得到的OpenID="+request.getParameter("openid"));
 		return mv;
 	}
 
@@ -76,9 +98,10 @@ public class WechatLearnStudyController extends AbstractWxPortalController{
 	}
 	
 	@RequestMapping(value="/addclasses",method=RequestMethod.POST)
-	public ModelAndView addClasses(Classes classes){
+	public ModelAndView addClasses(Classes classes,HttpServletRequest request, HttpServletResponse response){
 		ModelAndView mv=new ModelAndView();
 		Classes cls = findClassesById(classes.getId());
+		logger.info("当前得到的OpenID="+request.getParameter("openid"));
 		if(null==cls){
 			mv.setViewName("redirect:/learn/classes");
 			classes.setStudentcount(0);
