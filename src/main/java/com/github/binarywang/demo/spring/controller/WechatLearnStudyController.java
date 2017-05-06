@@ -1,5 +1,7 @@
 package com.github.binarywang.demo.spring.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +43,12 @@ public class WechatLearnStudyController extends AbstractWxPortalController{
 	}
 	
 	@RequestMapping(value="")
-	public ModelAndView Oauth(){
+	public ModelAndView Oauth() throws UnsupportedEncodingException{
 		ModelAndView mv=new ModelAndView();
 		String url=wxService.oauth2buildAuthorizationUrl("http://astra.ngrok.cc/learn/list", WxConsts.OAUTH2_SCOPE_USER_INFO, null);
+		//String real_redirect_url=URLEncoder.encode(url,"UTF-8");
+		//mv.setViewName("redirect:"+real_redirect_url);
+		//logger.info(real_redirect_url);
 		mv.setViewName("redirect:"+url);
 		logger.info(url);
 		return mv;
@@ -64,10 +69,18 @@ public class WechatLearnStudyController extends AbstractWxPortalController{
 		mv.addObject("length", list.size());
 		mv.addObject("pagenum", num);
 		mv.addObject("classes", classes);
+		/**
+		 * 旧的，获取OpenId的方式，这种方式适合使用SCOPE范围是snsapi_userinfo
+		 */
+//		
+//		WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxService.oauth2getAccessToken(code);
+//		WxMpUser wxMpUser = wxService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
+//		logger.info("当前得到的微信Code="+wxMpUser.getOpenId());
+		/**
+		 * 新的，获取OpenId的方式，这种方式适合使用SCOPE范围是snsapi_base
+		 */
 		WxMpOAuth2AccessToken wxMpOAuth2AccessToken = wxService.oauth2getAccessToken(code);
-		WxMpUser wxMpUser = wxService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
-		logger.info("当前得到的微信Code="+wxMpUser.getOpenId());
-		
+		logger.info("当前得到的微信OpenID="+wxMpOAuth2AccessToken.getOpenId());
 //		logger.info("当前得到的OpenID="+wxMpUser.getOpenId());
 		return mv;		
 	}
