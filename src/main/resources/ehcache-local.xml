@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:noNamespaceSchemaLocation="ehcache.xsd" dynamicConfig="true" name="defaultCache" updateCheck="false" monitoring="autodetect">
+
+	<diskStore path="../temp/wechat/ehcache" />
+
+	<!-- 默认缓存配置. 自动失效：最后一次访问时间间隔300秒失效，若没有访问过自创建时间600秒失效。-->
+<!-- 	<defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600"
+		overflowToDisk="true" statistics="true"/> -->
+	<defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="7200" timeToLiveSeconds="7200" 
+    	maxEntriesLocalDisk="10000000" diskExpiryThreadIntervalSeconds="7200" memoryStoreEvictionPolicy="LFU" statistics="true">
+    	<persistence strategy="localTempSwap"/>
+    </defaultCache>
+	
+	<!-- 系统缓存 -->
+	<!-- <cache name="sysCache" maxEntriesLocalHeap="1000" eternal="true" overflowToDisk="true" statistics="true"/> -->
+	<cache name="openIdCache" maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="7200" timeToLiveSeconds="7200" 
+    	maxEntriesLocalDisk="10000000" diskExpiryThreadIntervalSeconds="7200" memoryStoreEvictionPolicy="LFU" statistics="true">    	
+        	<persistence strategy="localTempSwap"/>
+    </cache>
+</ehcache>

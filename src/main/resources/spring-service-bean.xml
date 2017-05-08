@@ -25,5 +25,9 @@
       </list>
     </property>
   </bean>
+  
+  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache-local.xml" />
+  </bean>
 
 </beans>
